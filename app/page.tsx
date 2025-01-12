@@ -1,10 +1,13 @@
-import Image from "next/image";
+import Slider from "./_components/Slider";
+import {  getSliders } from "./_utils/gloabalApi";
 
-export default function Home() {
+export default  async function Home() {
+
+  const sliderList = await getSliders()
+
   return (
-<div>
-  <h1>OnlineGroceryStore</h1>
-</div>
+    <div>
+      <Slider sliderList={sliderList} />
+    </div>
   );
 }
-
