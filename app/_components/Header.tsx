@@ -6,6 +6,7 @@ import Image from "next/image";
 import { getCategory } from "../_utils/gloabalApi";
 
 import { LayoutGrid, Search, ShoppingCart } from "lucide-react";
+import { CircleUserRound } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +16,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 
 interface Props {}
 
@@ -32,12 +36,22 @@ interface category {
 const Header: React.FC<Props> = ({}) => {
   const [categoryList, setCategoryList] = useState<category[]>([]);
 
+  const isLogin = sessionStorage?.getItem("jwt");
+
+    const router = useRouter();
+
   useEffect(() => {
     getCategory().then((response) => {
-      console.log("response", response.data.data);
       setCategoryList(response.data.data);
     });
   }, []);
+
+
+  const signOut =() =>{
+    sessionStorage.clear();
+    router.push("/sign-in")
+
+  }
 
   return (
     <div className="p-5 shadow-sm flex justify-between ">
@@ -57,19 +71,22 @@ const Header: React.FC<Props> = ({}) => {
               <DropdownMenuSeparator />
 
               {categoryList.map((category) => (
-                <DropdownMenuItem>
-                  <h2 className="flex gap-2 items-center cursor-pointer">
-                    <Image
-                      src={
-                        process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
-                        category?.icon?.url}
-                      alt={category.Name}
-                      width={23} // Width of the image
-                      height={23} // Height of the image
-                    />
-                    {category.Name}
-                  </h2>
-                </DropdownMenuItem>
+                <Link href={"/products-category/" + category.Name}>
+                  <DropdownMenuItem>
+                    <h2 className="flex gap-2 items-center cursor-pointer">
+                      <Image
+                        src={
+                          process.env.NEXT_PUBLIC_BACKEND_BASE_URL +
+                          category?.icon?.url
+                        }
+                        alt={category.Name || "grocery"}
+                        width={23} // Width of the image
+                        height={23} // Height of the image
+                      />
+                      {category.Name}
+                    </h2>
+                  </DropdownMenuItem>
+                </Link>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -88,8 +105,26 @@ const Header: React.FC<Props> = ({}) => {
           {" "}
           <ShoppingCart /> 0
         </h2>
+        {!isLogin ? (
+          <Link href="/sign-in">
+            <Button>Login</Button>
+          </Link>
+        ):
+        // <CircleUserRound className='h-9 w-9 text-primary bg-green-100 rounded-full' />
+        <DropdownMenu>
+  <DropdownMenuTrigger asChild>
+  <CircleUserRound className='h-9 w-9 text-primary bg-green-100 rounded-full' />
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>Profile</DropdownMenuItem>
+    <DropdownMenuItem>orders</DropdownMenuItem>
+    <DropdownMenuItem onClick={signOut}>Logout</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
 
-        <Button>Login</Button>
+        }
       </div>
     </div>
   );
