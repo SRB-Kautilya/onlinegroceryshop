@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
-import { getCategory } from "../_utils/gloabalApi";
+import { getCategory, getItemCart } from "../_utils/gloabalApi";
 
 import { LayoutGrid, Search, ShoppingCart } from "lucide-react";
 import { CircleUserRound } from 'lucide-react';
@@ -35,8 +35,10 @@ interface category {
 
 const Header: React.FC<Props> = ({}) => {
   const [categoryList, setCategoryList] = useState<category[]>([]);
+  const [cartItems,setCartItems]= useState(0)
 
   const isLogin = sessionStorage?.getItem("jwt");
+  const user = JSON.parse(sessionStorage?.getItem("user")||'{}');
 
     const router = useRouter();
 
@@ -46,11 +48,20 @@ const Header: React.FC<Props> = ({}) => {
     });
   }, []);
 
+  useEffect(() => {
+    getCartItems()
+  }, []);
+
 
   const signOut =() =>{
     sessionStorage.clear();
     router.push("/sign-in")
 
+  }
+
+
+  const getCartItems = async () =>{
+    getItemCart(user.id,isLogin)
   }
 
   return (
@@ -103,7 +114,8 @@ const Header: React.FC<Props> = ({}) => {
       <div className="flex gap-8 items-center">
         <h2 className="flex gap-2 items-center text-lg">
           {" "}
-          <ShoppingCart /> 0
+          <ShoppingCart />
+          <span className ='bg-green-500 text-white px-2 rounded-full'>{cartItems}</span> 
         </h2>
         {!isLogin ? (
           <Link href="/sign-in">

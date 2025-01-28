@@ -55,3 +55,19 @@ export const signIn = async (email:string,password:string) => {
 }
 
 
+export const addToGroceryCart =  (data:any, jwt:string)=> axiosClient.post('/user-carts',data, {
+headers:{
+Authorization:'Bearer' + jwt
+}
+});
+
+
+export const getItemCart =  (userId:any, jwt:string)=> axiosClient.get('/user-carts?filters[userId][$eq]='+userId +'&[populate][products][populate][images][populate][0]=url',{
+   headers:{
+   Authorization:'Bearer ' + jwt
+   }
+   }).then((res)=>{
+      console.log('res',res)
+   });
+
+
